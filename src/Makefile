@@ -9,7 +9,3 @@ PCRE_SWITCHES := $(shell $(OCTAVE) \
 
 pcregexp.oct: %.oct: %.cc
 	$(MKOCTFILE) $(PCRE_SWITCHES) -o $@ $<
-
-clean:
-	rm -f *.o octave-core core *.oct *~
-
