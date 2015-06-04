@@ -3,24 +3,13 @@ syntax: regexp
 # to mean "at any directory" while the ^ idiom means "from the
 # project's top-level directory".
 
-(^|/).*\.dvi$
-(^|/).*\.pdf$
-(^|/).*\.o$
-(^|/).*\.oct$
-(^|/).*\.octlink$
-(^|/)octave-core$
-(^|/).*\.tar\.gz$
+(^|/)octave-(core|workspace)$
+\.oct$
+\.o$
+fntests.log
 
-(^|/)aclocal\.m4$
-(^|/)configure$
-(^|/)autom4te\.cache($|/)
-
-# e.g. doc/faq/OctaveFAQ.info
-#      doc/interpreter/octave.info-4
-^doc/.*\.info(-\d)?$
-
-^doc/\w*/stamp-vti$
-^doc/\w*/version\.texi$
+# The following files are created during package build
+^build/
 
 # Emacs tools create these
 (^|/)TAGS$
