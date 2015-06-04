@@ -48,8 +48,8 @@
 ##
 ## @example
 ## @group
-##          editdistance('marry','marie') 
-##          ##returns value +2 for the distance.
+## editdistance ('marry', 'marie') 
+##   @result{}  2
 ## @end group
 ## @end example
 ##

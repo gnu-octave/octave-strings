@@ -12,9 +12,8 @@
 ## Example:
 ## @example
 ## @group
-## base64encode('Hakuna Matata',true) 
-## ##returns 'SGFrdW5hIE1hdGF0YQ=='
-##
+## base64encode ('Hakuna Matata', true) 
+##   @result{} SGFrdW5hIE1hdGF0YQ==
 ## @end group
 ## @end example
 ## @seealso{base64decode}

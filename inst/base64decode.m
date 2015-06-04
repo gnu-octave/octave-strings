@@ -22,9 +22,8 @@
 ##
 ## @example
 ## @group
-##           ##base64decode(base64encode('Hakuna Matata'),true)
-##           base64decode('SGFrdW5hIE1hdGF0YQ==',true)
-##           ##returns 'Hakuna Matata'
+## base64decode ('SGFrdW5hIE1hdGF0YQ==', true)
+##   @result{} Hakuna Matata
 ## @end group
 ## @end example
 ##

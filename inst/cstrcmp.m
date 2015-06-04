@@ -35,12 +35,12 @@
 ##
 ## @example
 ## @group
-## cstrcmp("marry","marry")
-##       @result{}  0
-## cstrcmp("marry","marri")
-##       @result{} +1
-## cstrcmp("marri","marry")
-##       @result{} -1
+## cstrcmp ("marry", "marry")
+##   @result{}  0
+## cstrcmp ("marry", "marri")
+##   @result{}  1
+## cstrcmp ("marri", "marry")
+##   @result{} -1
 ## @end group
 ## @end example
 ##
