@@ -2,7 +2,6 @@ strings >> Strings
 Search and replace
  pcregexp
 Operations
- strsort
  editdistance
  cstrcmp
 Conversion
