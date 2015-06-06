@@ -2,7 +2,7 @@ OCTAVE ?= octave
 MKOCTFILE ?= mkoctfile -Wall
 
 PCRE_SWITCHES := $(shell $(OCTAVE) \
-	--no-gui --no-init-file --no-site-file --silent \
+	--no-gui --no-init-file --no-site-file --silent --no-history \
 	--eval 'disp (octave_config_info ("PCRE_LIBS"));' \
 	--eval 'disp (octave_config_info ("PCRE_CPPFLAGS"));' \
 	)
