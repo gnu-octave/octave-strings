@@ -8,7 +8,6 @@
 ## @seealso {sort}
 ## @end deftypefn
 
-# PKG_ADD dispatch ("sort", "strsort", "string")
 function [sorted,idx] = strsort(string,varargin)
   if nargout == 2
     [s,idx] = sort(toascii(string),varargin{:});
