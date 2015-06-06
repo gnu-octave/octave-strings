@@ -1,13 +1,30 @@
-## Author: Paul Kienzle <pkienzle@users.sf.net>
-## This program is granted to the public domain.
+## Copyright 2006(?) Paul Kienzle <pkienzle@users.sf.net>
+## Copyright 2015 Oliver Heimlich <oheim@posteo.de>
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 ## -*- texinfo -*-
 ## @deftypefn {Function File} {@var{Y} =} base64encode (@var{X})
-## @deftypefnx {Function File} {@var{Y} =} base64encode (@var{X}, @var{do_reshape})
-## Convert X into string of printable characters according to RFC 2045.
+## @deftypefnx {Function File} {@var{Y} =} base64encode (@var{X}, @var{row_vector})
+## Convert @var{X} into string of printable characters according to RFC 2045.
+##
 ## The input may be a string or a matrix of integers in the range 0..255.
+##
 ## If want the output in the 1-row of strings format, pass the 
-## @var{do_reshape} argument as true.
+## @var{row_vector} argument as @code{true}.  Otherwise the output is a 4-row
+## character matrix, which contains 4 encoded bytes in each column for each
+## 3 bytes from the input.
 ## 
 ## Example:
 ## @example
@@ -16,61 +33,35 @@
 ##   @result{} SGFrdW5hIE1hdGF0YQ==
 ## @end group
 ## @end example
-## @seealso{base64decode}
+## @seealso{base64decode, base64_encode}
 ## @end deftypefn
 
-function Y = base64encode (X, do_reshape)
-
-  if (nargin < 1)
+function Y = base64encode (X, row_vector)
+  if (nargin < 1 || nargin > 2)
     print_usage;
-  elseif nargin != 2
-    do_reshape=false;
   endif
-  if (ischar(X))
-    X = toascii(X);
-  elseif (any(X(:)) != fix(X(:)) || any(X(:) < 0) || any(X(:) > 255))
-    error("base64encode is expecting integers in the range 0 .. 255");
+  
+  if (nargin < 2)
+    row_vector = false;
+  endif
+  
+  if (ischar (X))
+    X = toascii (X);
+  endif
+  
+  if (any (X != fix (X)) || any (X < 0 | X > 255))
+    error ("base64encode is expecting integers in the range 0 .. 255");
   endif
 
-  n = length(X(:));
-  X = X(:);
+  Y = base64_encode (uint8 (X));
 
-  ## split the input into three pieces, zero padding to the same length
-  in1 = X(1:3:n);
-  in2 = zeros(size(in1));
-  in3 = zeros(size(in1));
-  in2(1:length(2:3:n)) = X(2:3:n);
-  in3(1:length(3:3:n)) = X(3:3:n);
-
-  ## put the top bits of the inputs into the bottom bits of the 
-  ## corresponding outputs
-  out1 = fix(in1/4);
-  out2 = fix(in2/16);
-  out3 = fix(in3/64);
-
-  ## add the bottom bits of the inputs as the top bits of the corresponding
-  ## outputs
-  out4 =            in3 - 64*out3;
-  out3 = out3 +  4*(in2 - 16*out2);
-  out2 = out2 + 16*(in1 -  4*out1);
-
-  ## correct the output for padding
-  if (length(2:3:n) < length(1:3:n)) out3(length(out3)) = 64; endif
-  if (length(3:3:n) < length(1:3:n)) out4(length(out4)) = 64; endif
-
-  ## 6-bit encoding table, plus 1 for padding
-  table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
-  table([ out1']+ 1);
-  table([ out2']+ 1);
-  table([ out3']+ 1);
-  table([ out4']+ 1);
-
-  Y = table([ out1'; out2'; out3'; out4' ] + 1);
-
-  if ( do_reshape )
-     Y = reshape(Y,[1, prod(size(Y))]);
+  if (not (row_vector))
+     Y = reshape (Y, 4, []);
   end
 endfunction
 
-%!assert(base64encode('Hakuna Matata',true),'SGFrdW5hIE1hdGF0YQ==')
+%!assert (base64encode ('Hakuna Matata', true), 'SGFrdW5hIE1hdGF0YQ==')
+%!assert (base64encode ('Hakuna Matata', false), ['SdIdY'; ...
+%!                                                'GWEGQ'; ...
+%!                                                'F51F='; ...
+%!                                                'rhh0='])
