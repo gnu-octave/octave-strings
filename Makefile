@@ -136,6 +136,9 @@ $(HTML_TARBALL_COMPRESSED): $(INSTALLED_PACKAGE) | $(BUILD_DIR)
 		 generate_package_html ('$(PACKAGE)', '$(HTML_DIR)', options)"
 	@tar --create --auto-compress --transform="s!^$(BUILD_DIR)/!!" --file "$@" "$(HTML_DIR)"
 
+src/Makefile: src/Makefile.in
+	@(cd src; ./bootstrap; ./configure)
+
 ## If the src/Makefile changes, recompile all oct-files
 $(CC_SOURCES): src/Makefile
 	@touch --no-create "$@"
@@ -175,7 +178,7 @@ doctest: $(OCT_COMPILED)
 	@echo "Testing documentation strings ..."
 	@$(OCTAVE) --silent --path "inst/" --path "src/" --eval \
 		"pkg load doctest; \
-		 targets = '$(shell (ls inst; ls src | grep .oct) | cut -f2 -d@ | cut -f1 -d.)'; \
+		 targets = '$(shell (ls inst; ls src | grep \\.oct) | cut -f2 -d@ | cut -f1 -d.)'; \
 		 targets = strsplit (targets, ' '); \
 		 success = doctest (targets); \
 		 exit (!success)"

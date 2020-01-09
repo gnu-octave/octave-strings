@@ -1,10 +1,14 @@
+Summary of important user-visible changes for strings 1.2.1+:
+-------------------------------------------------------------------
+
+ ** Update package to compile in GNU Octave 5+
+
 Summary of important user-visible changes for strings 1.2.1:
 -------------------------------------------------------------------
 
  ** The function base64decode has been almost rewritten and no longer returns
     trailing zeros which have been introduced by padding (bug #38974), returns
     uint8 vectors instead of binary64 vectors, and should perform faster.
-
 
 Summary of important user-visible changes for strings 1.2.0:
 -------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// Copyright (C) 2004 Stefan van der Walt <stefan@sun.ac.za>
+// Copyright (C) 2004-2019 Stefan van der Walt <stefan@sun.ac.za>
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,8 @@
 #include <iostream>
 #include <vector>
 
+#include "config.h"
+
 //FIXME This function needs some documentation
 DEFUN_DLD(pcregexp, args, nargout, "\
 -*- texinfo -*-\n\
@@ -49,7 +51,7 @@ Check your system's @code{pcre} man page.\n\
     std::string pattern = args(0).string_value();
     std::string input = args(1).string_value();
     if (error_state) {
-        gripe_wrong_type_arg("pcregexp", args(0));
+        OCTAVE__WRONG_TYPE_ARG("pcregexp", args(0));
         return retval;
     }
 
