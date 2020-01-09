@@ -40,11 +40,12 @@ SHELL   = /bin/sh
 ##     for publication of this package on Octave Forge.
 ##
 
+PWD := $(shell pwd)
 PACKAGE = $(shell grep "^Name: " DESCRIPTION | cut -f2 -d" ")
 VERSION = $(shell grep "^Version: " DESCRIPTION | cut -f2 -d" ")
 CC_SOURCES = $(wildcard src/*.cc)
 CC_WITH_TESTS = $(shell grep --files-with-matches '^%!' $(CC_SOURCES))
-BUILD_DIR = build
+BUILD_DIR = $(PWD)/build
 RELEASE_DIR = $(BUILD_DIR)/$(PACKAGE)-$(VERSION)
 RELEASE_TARBALL = $(RELEASE_DIR).tar
 RELEASE_TARBALL_COMPRESSED = $(RELEASE_TARBALL).gz
@@ -168,8 +169,8 @@ run: $(OCT_COMPILED)
 ## Validate unit tests
 test: $(OCT_COMPILED) $(EXTRACTED_CC_TESTS)
 	@echo "Testing package in GNU Octave ..."
-	@$(OCTAVE) --silent --path "inst/" --path "src/" \
-		--eval "__run_test_suite__ ({'.'}, {})"
+	@$(OCTAVE) --silent --path "$(PWD)/inst/" --path "$(PWD)/src/" \
+		--eval "__run_test_suite__ ({'$(PWD)'}, {})"
 	@! grep '!!!!! test failed' fntests.log
 	@echo
 
