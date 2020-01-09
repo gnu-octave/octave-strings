@@ -46,7 +46,7 @@ function Y = base64encode (X, row_vector)
   endif
   
   if (ischar (X))
-    X = toascii (X);
+    X = double (X);
   endif
   
   if (any (X != fix (X)) || any (X < 0 | X > 255))
