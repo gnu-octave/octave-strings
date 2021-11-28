@@ -50,10 +50,6 @@ Check your system's @code{pcre} man page.\n\
 
     std::string pattern = args(0).string_value();
     std::string input = args(1).string_value();
-    if (error_state) {
-        OCTAVE__WRONG_TYPE_ARG("pcregexp", args(0));
-        return retval;
-    }
 
     // Compile expression
     pcre *re;
