@@ -87,8 +87,9 @@ $(RELEASE_DIR): .hg/dirstate
 #	$(MAKE) -C "$@" docs
 	chmod -R a+rX,u+w,go-w "$@"
 
-html_options = --eval 'options = get_html_options ("octave-forge");' \
-               --eval 'options.package_doc = "$(PACKAGE).texi";'
+html_options = --eval 'options = get_html_options ("octave-forge");'
+#html_options = --eval 'options = get_html_options ("octave-forge");' \
+#               --eval 'options.package_doc = "$(PACKAGE).texi";'
 $(HTML_DIR): install
 	@echo "Generating HTML documentation. This may take a while ..."
 	$(RM) -r "$@"
