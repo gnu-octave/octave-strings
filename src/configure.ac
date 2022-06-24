@@ -54,10 +54,20 @@ AC_PROG_CXXCPP
 # Checks for typedefs, structures, and compiler characteristics.
 
 # Checks for library functions.
-PKG_CHECK_MODULES([PCRE],[libpcre],
- [],
- [AC_MSG_ERROR([libpcre not found])]
+USE_PCRE2=no
+PKG_CHECK_MODULES([PCRE2],[libpcre2-8],
+ [USE_PCRE2=yes],
+ [
+  PKG_CHECK_MODULES([PCRE],[libpcre],
+   [],
+   [AC_MSG_ERROR([libpcre and libpre2 not found])])
+ ]
 )
+if test x$USE_PCRE2 == xyes; then
+PCRE_CFLAGS="$PCRE2_CFLAGS -DUSE_PCRE2"
+PCRE_LIBS=$PCRE2_LIBS
+fi
+
 
 
 # Start of checks for Octave features, preparations for checks.

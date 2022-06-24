@@ -1,4 +1,4 @@
-// Copyright (C) 2004-2019 Stefan van der Walt <stefan@sun.ac.za>
+// Copyright (C) 2004-2022 Stefan van der Walt <stefan@sun.ac.za>
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -22,7 +22,13 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <octave/oct.h>
+#ifdef USE_PCRE2
+#define PCRE2_DATA_WIDTH 8
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+#else
 #include <pcre.h>
+#endif
 #include <iostream>
 #include <vector>
 
@@ -52,6 +58,57 @@ Check your system's @code{pcre} man page.\n\
     std::string input = args(1).string_value();
 
     // Compile expression
+#ifdef USE_PCRE2
+    pcre2_code *re;
+    PCRE2_UCHAR err[128];
+    PCRE2_SIZE erroffset;
+    int errnumber;
+
+    re = pcre2_compile((PCRE2_SPTR)pattern.c_str(), PCRE2_ZERO_TERMINATED, 0, &errnumber, &erroffset, NULL);
+     
+    if (re == NULL) {
+        pcre2_get_error_message(errnumber, err, sizeof(err));
+        error("pcregexp: %s at position %ld of expression", err, erroffset);
+        return retval;
+    }
+    // Get nr of subpatterns
+    pcre2_match_data *match_data;
+    PCRE2_SIZE *ovector;
+    match_data = pcre2_match_data_create_from_pattern(re, NULL);
+    int matches = pcre2_match(re, (PCRE2_SPTR)input.c_str(), input.length(), 0, 0, match_data, NULL);
+   
+    if (matches == PCRE2_ERROR_NOMATCH) {
+        for (int i=nargout-1; i>=0; i--) retval(i) = "";
+            retval(0) = Matrix();
+        pcre2_code_free(re);
+        return retval;
+    } else if (matches < -1) {
+       error("pcregexp: internal error calling pcre_exec");
+       return retval;
+    }
+ 
+    ovector = pcre2_get_ovector_pointer(match_data);
+ 
+    // Pack indeces
+    Matrix indeces = Matrix(matches, 2);
+    for (int i = 0; i < matches; i++) {
+        indeces(i, 0) = ovector[2*i]+1;
+        indeces(i, 1) = ovector[2*i+1];
+        if (indeces(i, 0) == 0) indeces(i, 1) = 0;
+    }
+    retval(0) = indeces;
+
+    // Pack substrings
+    retval.resize(nargout + 1);
+    for (int i = 1; i < matches; i++)
+        retval(i) = std::string(input.c_str() + ovector[2*i],
+                                ovector[2*i+1] - ovector[2*i]);
+ 
+     // Free memory
+    pcre2_match_data_free(match_data);
+    pcre2_code_free(re);
+ 
+#else
     pcre *re;
     const char *err;
     int erroffset;
@@ -107,6 +164,7 @@ Check your system's @code{pcre} man page.\n\
     // Free memory
     pcre_free_substring_list(listptr);
     pcre_free(re);
+#endif
 
     if (nargout > matches) {
         error("pcregexp: too many return values requested");
