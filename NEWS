@@ -1,7 +1,9 @@
-Summary of important user-visible changes for strings 1.2.1+:
+Summary of important user-visible changes for strings 1.3.0:
 -------------------------------------------------------------------
 
  ** Update package to compile in GNU Octave 5+
+
+ ** Add detection and use of pcre2 if available
 
 Summary of important user-visible changes for strings 1.2.1:
 -------------------------------------------------------------------
