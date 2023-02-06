@@ -23,6 +23,7 @@
 
 #include <octave/oct.h>
 #ifdef USE_PCRE2
+#include <octave/unwind-prot.h>
 #define PCRE2_DATA_WIDTH 8
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
@@ -75,12 +76,19 @@ Check your system's @code{pcre} man page.\n\
     pcre2_match_data *match_data;
     PCRE2_SIZE *ovector;
     match_data = pcre2_match_data_create_from_pattern(re, NULL);
+
+    octave::unwind_action cleanup
+      ([=] () {
+        // Free memory
+ 	 pcre2_match_data_free(match_data);
+ 	 pcre2_code_free(re);
+      });
+   
     int matches = pcre2_match(re, (PCRE2_SPTR)input.c_str(), input.length(), 0, 0, match_data, NULL);
    
     if (matches == PCRE2_ERROR_NOMATCH) {
         for (int i=nargout-1; i>=0; i--) retval(i) = "";
             retval(0) = Matrix();
-        pcre2_code_free(re);
         return retval;
     } else if (matches < -1) {
        error("pcregexp: internal error calling pcre_exec");
@@ -103,10 +111,6 @@ Check your system's @code{pcre} man page.\n\
     for (int i = 1; i < matches; i++)
         retval(i) = std::string(input.c_str() + ovector[2*i],
                                 ovector[2*i+1] - ovector[2*i]);
- 
-     // Free memory
-    pcre2_match_data_free(match_data);
-    pcre2_code_free(re);
  
 #else
     pcre *re;
