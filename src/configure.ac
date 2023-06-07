@@ -103,6 +103,25 @@ OF_OCTAVE_LIST_ALT_SYMS([
 ],
    [oct-alt-includes.h])
 
+AC_MSG_CHECKING([for octave::unwind_action])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+   #include <octave/oct.h>
+   #include <octave/unwind-prot.h>
+   #ifdef HAVE_CONFIG_H
+   #  include "config.h"
+   #endif
+   void test_f() {}
+  ]],[
+    octave::unwind_action u(test_f);
+  ])],
+ [octave_unwind_action=yes],
+ [octave_unwind_action=no]
+)
+AC_MSG_RESULT([$octave_unwind_action])
+if test $octave_unwind_action = yes; then
+  AC_DEFINE([HAVE_OCTAVE_UNWIND_ACTION],[1],[unwind_action])
+fi
+
 LIBS=$TLIBS
 LDFLAGS=$TLDFLAGS
 CXXFLAGS=$TCXXFLAGS

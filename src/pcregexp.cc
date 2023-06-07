@@ -77,12 +77,18 @@ Check your system's @code{pcre} man page.\n\
     PCRE2_SIZE *ovector;
     match_data = pcre2_match_data_create_from_pattern(re, NULL);
 
+#ifdef HAVE_OCTAVE_UNWIND_ACTION
     octave::unwind_action cleanup
       ([=] () {
         // Free memory
  	 pcre2_match_data_free(match_data);
  	 pcre2_code_free(re);
       });
+#else
+    octave::unwind_protect cleanup;
+    cleanup.add_fcn (pcre2_match_data_free, match_data);
+    cleanup.add_fcn (pcre2_code_free, re);
+#endif
    
     int matches = pcre2_match(re, (PCRE2_SPTR)input.c_str(), input.length(), 0, 0, match_data, NULL);
    
