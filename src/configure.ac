@@ -99,6 +99,14 @@ OF_OCTAVE_LIST_ALT_SYMS([
   [OCTAVE__WRONG_TYPE_ARG],
   [],
   []
+],
+[dnl
+  [unwind_protect],
+  [octave::unwind_protect],
+  [[octave::unwind_protect frame;]],
+  [OCTAVE__UNWIND_PROTECT],
+  [],
+  []
 ]
 ],
    [oct-alt-includes.h])

@@ -85,7 +85,7 @@ Check your system's @code{pcre} man page.\n\
  	 pcre2_code_free(re);
       });
 #else
-    octave::unwind_protect cleanup;
+    OCTAVE__UNWIND_PROTECT cleanup;
     cleanup.add_fcn (pcre2_match_data_free, match_data);
     cleanup.add_fcn (pcre2_code_free, re);
 #endif

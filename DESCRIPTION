@@ -5,7 +5,7 @@ Author: various authors
 Maintainer: John Donoghue <john.donoghue@ieee.org>
 Title: String Handling.
 Description: Additional functions for manipulation and analysis of strings.
-Depends: octave (>= 4.2.0)
+Depends: octave (>= 3.8.0)
 Autoload: no
 BuildRequires: pcre-devel [Debian] libpcre3-dev
 License: GPLv3+, FreeBSD
