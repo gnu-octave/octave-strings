@@ -62,7 +62,7 @@ PKG_CHECK_MODULES([PCRE2],[libpcre2-8],
  [
   PKG_CHECK_MODULES([PCRE],[libpcre],
    [],
-   [AC_MSG_ERROR([libpcre and libpre2 not found])])
+   [PCRE_CFLAGS=""])
  ]
 )
 if test x$USE_PCRE2 == xyes; then
@@ -70,7 +70,21 @@ PCRE_CFLAGS="$PCRE2_CFLAGS -DUSE_PCRE2"
 PCRE_LIBS=$PCRE2_LIBS
 fi
 
+if test -z "$PKG_CONFIG"; then
+  # fallback detection if no pkg-config
+  if test -z "$PCRE_CFLAGS"; then
+    AC_CHECK_HEADERS([pcre2.h],
+      [AC_CHECK_LIB([pcre2-8], [pcre2_config_8], [PCRE_CFLAGS="-DUSE_PCRE2"; PCRE_LIBS=-lpcre2-8], [])], [], [[#define PCRE2_CODE_UNIT_WIDTH 8]])
+    if test -z "$PCRE_CFLAGS"; then
+      AC_CHECK_HEADERS([pcre.h],
+        [AC_CHECK_LIB([pcre], [pcre_config], [PCRE_CFLAGS=""; PCRE_LIBS=-lpcre], [])], [])
+    fi
+  fi
+fi
 
+if test -z "$PCRE_CFLAGS$PCRE_LIBS"; then
+  AC_MSG_ERROR([libpcre and libpre2 not found])
+fi
 
 # Start of checks for Octave features, preparations for checks.
 OCTLIBDIR=${OCTLIBDIR:-`$OCTAVE_CONFIG -p OCTLIBDIR`}
