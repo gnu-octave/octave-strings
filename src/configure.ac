@@ -29,7 +29,14 @@ AH_TOP([#include "undef-ah-octave.h"])
 
 AC_CONFIG_MACRO_DIRS([m4])
 
+
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
 # Checks for programs.
+AC_PROG_GREP
+AC_PROG_SED
+
 AC_CHECK_PROG(MKOCTFILE, mkoctfile, mkoctfile)
 if test -z "$MKOCTFILE"; then
 AC_MSG_ERROR([mkoctfile not found], 1);
@@ -37,6 +44,19 @@ fi
 AC_CHECK_PROG(OCTAVE_CONFIG, octave-config, octave-config)
 if test -z "$OCTAVE_CONFIG"; then
 AC_MSG_ERROR([octave-config not found], 1);
+fi
+
+# try get around possible spaces in the path
+if test "X${IGNORE_MINGW_PATH_MODIFICATION}" == "X"; then
+case $host_os in
+  mingw*)
+    # try demangle spaces in escaped input strings
+    MKOCTFILE=`echo $MKOCTFILE | $SED "s,\\\\\ ,?,g"`
+    OCTAVE_CONFIG=`echo $OCTAVE_CONFIG | $SED "s,\\\\\ ,?,g"`
+    ;;
+  *)
+    ;;
+esac
 fi
 
 #AC_CHECK_TOOL(PKG_CONFIG, pkg-config, [])
@@ -51,7 +71,6 @@ AC_PROG_CXX
   
 AC_PROG_CXXCPP
 
-AC_PROG_GREP
 
 # Checks for typedefs, structures, and compiler characteristics.
 
@@ -93,7 +112,31 @@ OCTLIBDIR=${OCTLIBDIR:-`$OCTAVE_CONFIG -p OCTLIBDIR`}
 ## for Octave headers, like octave/....h. The path with '/octave' is
 ## needed since some Octave headers contain include directives for
 ## other Octave headers with <> instead of "".
-OCTINCLUDEDIR=${OCTINCLUDEDIR:-`$MKOCTFILE -p INCFLAGS`}
+OCTINCLUDEDIR="${OCTINCLUDEDIR:-`$MKOCTFILE -p OCTINCLUDEDIR`}/.."
+
+if test "X${IGNORE_MINGW_PATH_MODIFICATION}" == "X"; then
+  MSYSTEM="${MSYSTEM}"
+else
+  MSYSTEM="none"
+fi
+
+case X$MSYSTEM in
+  XMINGW64*)
+    OCTAVE_HOME=`${MKOCTFILE} -p OCTAVE_HOME | $SED 's,\\\\,/,g'`
+    # change \ to / and replace octave home part with mingw part
+    OCTINCLUDEDIR=`echo $OCTINCLUDEDIR | $SED -e 's,\\\\,/,g' -e "s,${OCTAVE_HOME},/mingw64,g"`
+    OCTLIBDIR=`echo $OCTLIBDIR | $SED -e 's,\\\\,/,g' -e "s,${OCTAVE_HOME},/mingw64,g"`
+    ;;
+  XMINGW32*)
+    OCTAVE_HOME=`${MKOCTFILE} -p OCTAVE_HOME | $SED 's,\\\\,/,g'`
+    # change \ to / and replace octave home part with mingw part
+    OCTINCLUDEDIR=`echo $OCTINCLUDEDIR | $SED -e 's,\\\\,/,g' -e "s,${OCTAVE_HOME},/mingw32,g"`
+    OCTLIBDIR=`echo $OCTLIBDIR | $SED -e 's,\\\\,/,g -e "s,${OCTAVE_HOME},/mingw32,g"'`
+    ;;
+  *)
+    ;;
+esac
+
 AC_LANG_PUSH([C++])
 TCXXFLAGS=$CXXFLAGS
 TLDFLAGS=$LDFLAGS
@@ -102,7 +145,7 @@ TCPPFLAGS=$CPPFLAGS
 LDFLAGS="-L$OCTLIBDIR $LDFLAGS"
 LIBS="-loctinterp $LIBS"
 # CXXFLAGS=
-CPPFLAGS="$OCTINCLUDEDIR $CPPFLAGS"
+CPPFLAGS="-I$OCTINCLUDEDIR $CPPFLAGS"
 
 ## Simple symbol alternatives of different Octave versions.
 OF_OCTAVE_LIST_ALT_SYMS([
