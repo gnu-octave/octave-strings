@@ -38,10 +38,12 @@ HTML_TARBALL    := $(TARGET_DIR)/$(PACKAGE)-html.tar.gz
 
 PKG_ADD     := 
 
+AUTOCONF_TARGETS := src/configure src/Makefile
+
 OCTAVE ?= octave --no-window-system --silent
 MKOCTFILE ?= mkoctfile
 
-.PHONY: help dist html release install all check run clean test_files
+.PHONY: help dist html release install all check run clean test_files autoconf_target
 
 help:
 	@echo "Targets:"
@@ -113,8 +115,15 @@ install: $(RELEASE_TARBALL)
 	@echo "Installing package locally ..."
 	$(OCTAVE) --eval 'pkg ("install", "-verbose", "${RELEASE_TARBALL}")'
 
-all: $(CC_SOURCES)
-	cd src/ && ./bootstrap && ./configure
+src/configure: src/configure.ac
+	cd src && $(SHELL) ./bootstrap
+
+src/Makefile: src/Makefile.in src/configure
+	cd src && ./configure
+
+autoconf_target: $(AUTOCONF_TARGETS)
+
+all: autoconf_target $(CC_SOURCES)
 	$(MAKE) -C src/
 
 check: all
