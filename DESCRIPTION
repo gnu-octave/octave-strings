@@ -9,4 +9,6 @@ Depends: octave (>= 3.8.0)
 Autoload: no
 BuildRequires: pcre-devel [Debian] libpcre3-dev
 License: GPLv3+, FreeBSD
-Url: http://octave.sourceforge.net/strings/
+Url: https://gnu-octave.github.io/octave-strings/
+Repository: https://github.com/gnu-octave/octave-strings/
+Tracker: https://github.com/gnu-octave/octave-strings/issues
