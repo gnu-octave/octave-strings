@@ -1,0 +1,23 @@
+---
+layout: "overview"
+permalink: "/index"
+title: "Strings Toolkit - Overview"
+pkg_name: "strings"
+version: "1.3.1"
+pkg_date: "2023-06-09"
+description: "Additional functions for manipulation and analysis of strings."
+author: "various authors"
+maintainer: "John Donoghue <john.donoghue@ieee.org>"
+license: "GPLv3+, FreeBSD"
+pkg_url: "http://octave.sourceforge.net/strings/"
+issues: "http://octave.sourceforge.net/strings/"
+navigation:
+- id: "overview"
+  name: "Overview"
+- id: "Functions"
+  name: "Function Reference"
+  url: "/functions"
+- id: "news"
+  name: "News"
+  url: "/news"
+---
