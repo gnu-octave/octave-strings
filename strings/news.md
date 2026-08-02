@@ -3,7 +3,7 @@ layout: "default"
 permalink: "/news/"
 title: "Strings Toolkit - News"
 pkg_name: "strings"
-version: "1.3.1"
+version: "1.3.2"
 description: "Additional functions for manipulation and analysis of strings."
 navigation:
 - id: "overview"
@@ -16,6 +16,13 @@ navigation:
   name: "News"
 ---
 <pre>
+Summary of important user-visible changes for strings 1.3.2:
+-------------------------------------------------------------------
+
+ ** Updates to support spaces in Windows path
+
+ ** Updates for Octave 12+ compatability
+
 Summary of important user-visible changes for strings 1.3.1:
 -------------------------------------------------------------------
 

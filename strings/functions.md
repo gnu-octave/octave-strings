@@ -3,7 +3,7 @@ layout: "function_list"
 permalink: "/functions/"
 title: "Strings Toolkit - Functions"
 pkg_name: "strings"
-version: "1.3.1"
+version: "1.3.2"
 description: "Additional functions for manipulation and analysis of strings."
 categories:
 - id: "18_Searchandreplace"

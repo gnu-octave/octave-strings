@@ -2,7 +2,7 @@
 layout: "default"
 permalink: "/functions/8_pcregexp/"
 pkg_name: "strings"
-pkg_version: "1.3.1"
+pkg_version: "1.3.2"
 pkg_description: "Additional functions for manipulation and analysis of strings."
 title: "Strings Toolkit - pcregexp"
 category: "Conversion"
