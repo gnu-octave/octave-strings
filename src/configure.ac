@@ -19,7 +19,7 @@
 ### <http://www.gnu.org/licenses/>.
 
 AC_PREREQ([2.67])
-AC_INIT([strings], [1.3.1])
+AC_INIT([strings], [1.3.2])
 AC_CONFIG_SRCDIR([pcregexp.cc])
 AC_CONFIG_HEADERS([config.h])
 
