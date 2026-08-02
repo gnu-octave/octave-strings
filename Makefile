@@ -1,6 +1,6 @@
 ## Copyright 2015-2016 Carnë Draug
 ## Copyright 2015-2016 Oliver Heimlich
-## Copyright 2018-2019 John Donoghue
+## Copyright 2018-2026 John Donoghue
 ##
 ## Copying and distribution of this file, with or without modification,
 ## are permitted in any medium without royalty provided the copyright
@@ -22,12 +22,22 @@ PACKAGE := $(shell $(GREP) "^Name: " DESCRIPTION | $(CUT) -f2 -d" " | \
 $(TR) '[:upper:]' '[:lower:]')
 VERSION := $(shell $(GREP) "^Version: " DESCRIPTION | $(CUT) -f2 -d" ")
 
+## Detect which VCS is used
+vcs := $(if $(wildcard .hg),hg,$(if $(wildcard .git),git,unknown))
+ifeq ($(vcs),hg)
+release_dir_dep := .hg/dirstate
 HG           := hg
 HG_CMD        = $(HG) --config alias.$(1)=$(1) --config defaults.$(1)= $(1)
 HG_ID        := $(shell $(call HG_CMD,identify) --id | sed -e 's/+//' )
-HG_TIMESTAMP := $(firstword $(shell $(call HG_CMD,log) --rev $(HG_ID) --template '{date|hgdate}'))
+REPO_TIMESTAMP := $(firstword $(shell $(call HG_CMD,log) --rev $(HG_ID) --template '{date|hgdate}'))
+endif
+ifeq ($(vcs),git)
+release_dir_dep := .git/index
+GIT          := git
+REPO_TIMESTAMP := $(firstword $(shell $(GIT) log -n1 --date=unix --format="%ad"))
+endif
 
-TAR_REPRODUCIBLE_OPTIONS := --sort=name --mtime="@$(HG_TIMESTAMP)" --owner=0 --group=0 --numeric-owner
+TAR_REPRODUCIBLE_OPTIONS := --sort=name --mtime="@$(REPO_TIMESTAMP)" --owner=0 --group=0 --numeric-owner
 TAR_OPTIONS  := --format=ustar $(TAR_REPRODUCIBLE_OPTIONS)
 
 TARGET_DIR      := target
@@ -72,7 +82,7 @@ clean-docs:
 	$(RM) -f doc/functions.texi
 
 doc/$(PACKAGE).pdf: doc/$(PACKAGE).texi doc/functions.texi
-	cd doc && SOURCE_DATE_EPOCH=$(HG_TIMESTAMP) $(TEXI2PDF) $(PACKAGE).texi
+	cd doc && SOURCE_DATE_EPOCH=$(REPO_TIMESTAMP) $(TEXI2PDF) $(PACKAGE).texi
 	# remove temp files
 	cd doc && $(RM) -f $(PACKAGE).aux $(PACKAGE).cp $(PACKAGE).cps $(PACKAGE).fn  $(PACKAGE).fns $(PACKAGE).log $(PACKAGE).toc
 
@@ -80,10 +90,16 @@ doc/functions.texi:
 	cd doc && ./mkfuncdocs.py --src-dir=../inst/ --src-dir=../src/ ../INDEX | $(SED) 's/@seealso/@xseealso/g' > functions.texi
 
 
-$(RELEASE_DIR): .hg/dirstate
+$(RELEASE_DIR): $(release_dir_dep)
 	@echo "Creating package version $(VERSION) release ..."
 	$(RM) -r "$@"
+ifeq (${vcs},hg)
 	$(call HG_CMD,archive) --exclude ".hg*" --type files --rev $(HG_ID) "$@"
+endif
+ifeq (${vcs},git)
+	$(GIT) archive --format=tar --prefix="$@/" HEAD | $(TAR) -x
+	$(RM) "$@/.gitignore"
+endif
 	cd "$@/src" && ./bootstrap && $(RM) -r "autom4te.cache"
 	# build docs
 #	$(MAKE) -C "$@" docs
@@ -109,7 +125,6 @@ html: $(HTML_TARBALL)
 release: dist html
 	md5sum $(RELEASE_TARBALL) $(HTML_TARBALL)
 	@echo "Upload @ https://sourceforge.net/p/octave/package-releases/new/"
-	@echo 'Execute: hg tag "release-${VERSION}"'
 
 install: $(RELEASE_TARBALL)
 	@echo "Installing package locally ..."
